@@ -1,0 +1,250 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum PropertyType {
+  house
+  apartment
+  hybel
+  studio
+  room
+  commercial
+}
+
+enum PartyRole {
+  tenant
+  landlord
+  bank
+  agent
+}
+
+enum ContractStatus {
+  draft
+  active
+  expired
+  terminated
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+enum MaintenanceStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum OwnershipType {
+  freehold
+  leasehold
+  mortgage
+}
+
+enum MaintenancePriority {
+  low
+  medium
+  high
+  urgent
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model Property {
+  id           String       @id @default(cuid())
+  name         String
+  street       String
+  city         String
+  postalCode   String
+  country      String       @default("NO")
+  lat          Float?
+  lng          Float?
+  type         PropertyType
+  totalAreaM2  Float
+  energyRating String?
+
+  units              Unit[]
+  ownerships         Ownership[]
+  contracts          Contract[]
+  maintenanceRequests MaintenanceRequest[]
+  energyReadings     EnergyReading[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([city, country])
+}
+
+model Unit {
+  id           String   @id @default(cuid())
+  propertyId   String
+  label        String
+  areaM2       Float
+  floor        Int?
+  bedroomCount Int      @default(1)
+
+  property            Property             @relation(fields: [propertyId], references: [id])
+  contracts           Contract[]
+  maintenanceRequests MaintenanceRequest[]
+  energyReadings      EnergyReading[]
+
+  @@index([propertyId])
+}
+
+model Person {
+  id        String    @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String    @unique
+  phone     String?
+  role      PartyRole
+
+  ownerships           Ownership[]
+  contractsAsLandlord  Contract[]          @relation("Landlord")
+  contractsAsTenant    Contract[]          @relation("Tenant")
+  contractsAsBank      Contract[]          @relation("Bank")
+  paymentsFrom         Payment[]           @relation("PaymentFrom")
+  paymentsTo           Payment[]           @relation("PaymentTo")
+  maintenanceRequested MaintenanceRequest[] @relation("RequestedBy")
+  maintenanceAssigned  MaintenanceRequest[] @relation("AssignedTo")
+  energyReadings       EnergyReading[]
+  uploadedDocuments    Document[]
+
+  createdAt DateTime @default(now())
+}
+
+model Ownership {
+  id           String        @id @default(cuid())
+  propertyId   String
+  ownerId      String
+  type         OwnershipType
+  sharePercent Float         @default(100)
+  acquiredAt   DateTime
+  releasedAt   DateTime?
+
+  property Property @relation(fields: [propertyId], references: [id])
+  owner    Person   @relation(fields: [ownerId], references: [id])
+
+  @@index([propertyId])
+  @@index([ownerId])
+}
+
+model Contract {
+  id              String         @id @default(cuid())
+  propertyId      String
+  unitId          String?
+  landlordId      String
+  tenantId        String
+  bankId          String?
+  status          ContractStatus @default(draft)
+  rentAmount      Float
+  rentCurrency    String         @default("NOK")
+  depositAmount   Float
+  depositCurrency String         @default("NOK")
+  startDate       DateTime
+  endDate         DateTime?
+  noticePeriodDays Int           @default(30)
+
+  property  Property  @relation(fields: [propertyId], references: [id])
+  unit      Unit?     @relation(fields: [unitId], references: [id])
+  landlord  Person    @relation("Landlord", fields: [landlordId], references: [id])
+  tenant    Person    @relation("Tenant", fields: [tenantId], references: [id])
+  bank      Person?   @relation("Bank", fields: [bankId], references: [id])
+  payments  Payment[]
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([propertyId])
+  @@index([tenantId])
+  @@index([landlordId])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  contractId  String
+  fromPartyId String
+  toPartyId   String
+  amount      Float
+  currency    String        @default("NOK")
+  status      PaymentStatus @default(pending)
+  description String
+  dueDate     DateTime
+  paidAt      DateTime?
+
+  contract  Contract @relation(fields: [contractId], references: [id])
+  fromParty Person   @relation("PaymentFrom", fields: [fromPartyId], references: [id])
+  toParty   Person   @relation("PaymentTo", fields: [toPartyId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([contractId])
+  @@index([status, dueDate])
+}
+
+model MaintenanceRequest {
+  id            String              @id @default(cuid())
+  propertyId    String
+  unitId        String?
+  requestedById String
+  assignedToId  String?
+  status        MaintenanceStatus   @default(open)
+  title         String
+  description   String
+  priority      MaintenancePriority @default(medium)
+  attachments   String[]
+
+  property    Property  @relation(fields: [propertyId], references: [id])
+  unit        Unit?     @relation(fields: [unitId], references: [id])
+  requestedBy Person    @relation("RequestedBy", fields: [requestedById], references: [id])
+  assignedTo  Person?   @relation("AssignedTo", fields: [assignedToId], references: [id])
+
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([propertyId, status])
+}
+
+model EnergyReading {
+  id            String   @id @default(cuid())
+  propertyId    String
+  unitId        String?
+  readingKWh    Float
+  readingDate   DateTime
+  recordedById  String
+
+  property   Property @relation(fields: [propertyId], references: [id])
+  unit       Unit?    @relation(fields: [unitId], references: [id])
+  recordedBy Person   @relation(fields: [recordedById], references: [id])
+
+  @@index([propertyId, readingDate])
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  contractId   String?
+  name         String
+  url          String
+  mimeType     String
+  uploadedById String
+
+  contract   Contract? @relation(fields: [contractId], references: [id])
+  uploadedBy Person    @relation(fields: [uploadedById], references: [id])
+
+  uploadedAt DateTime @default(now())
+}
