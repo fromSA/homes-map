@@ -33,10 +33,14 @@ Goal: simplify interaction between tenants, landlords, and the bank around a pro
 
 By default the API starts on port 8080.
 
+Frontend is served by the same server at:
+
+- http://localhost:8080/
+
 ## API routes
 
 - GET /health
-- GET /properties
-- GET /properties/:id/flow-rates
+- GET /api/properties
+- GET /api/properties/:id/flow-rates
 
 The current implementation ships with sample in-memory data to validate the model and API shape.
