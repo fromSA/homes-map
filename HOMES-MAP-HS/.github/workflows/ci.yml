@@ -1,0 +1,44 @@
+name: Haskell CI
+
+on:
+  push:
+    paths:
+      - "HOMES-MAP-HS/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "HOMES-MAP-HS/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: HOMES-MAP-HS
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup GHC and Cabal
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: "9.6.5"
+          cabal-version: "3.12.1.0"
+
+      - name: Cache Cabal store
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cabal/store
+            dist-newstyle
+          key: ${{ runner.os }}-cabal-${{ hashFiles('HOMES-MAP-HS/**/*.cabal', 'HOMES-MAP-HS/cabal.project') }}
+          restore-keys: |
+            ${{ runner.os }}-cabal-
+
+      - name: Build
+        run: cabal build all
+
+      - name: Test
+        run: cabal test all

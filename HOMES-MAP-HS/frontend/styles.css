@@ -1,0 +1,160 @@
+:root {
+  --bg: #f3f7f4;
+  --ink: #0f172a;
+  --muted: #475569;
+  --card: #ffffff;
+  --line: #dbe4dd;
+  --accent: #0d7a5f;
+  --accent-2: #ed8e00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 20% 0%, #d7efe6, transparent 40%),
+    radial-gradient(circle at 90% 0%, #ffe7c5, transparent 35%),
+    var(--bg);
+}
+
+.hero {
+  padding: 3rem 1rem 2rem;
+}
+
+.hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0.2rem 0;
+  font-size: clamp(1.8rem, 2.8vw, 3rem);
+  line-height: 1.1;
+}
+
+.sub {
+  color: var(--muted);
+  max-width: 50ch;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h2 {
+  margin: 0;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.grid {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1rem;
+  background: var(--card);
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.meta {
+  color: var(--muted);
+  margin-top: 0.4rem;
+  font-size: 0.92rem;
+}
+
+.card button {
+  margin-top: 0.8rem;
+  border: none;
+  background: linear-gradient(90deg, var(--accent), #0b9f6f);
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  padding: 1rem;
+}
+
+.panel.empty {
+  color: var(--muted);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.metric {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: #fcfdfc;
+}
+
+.metric .label {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.metric .value {
+  margin-top: 0.3rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.metric.warn .value {
+  color: var(--accent-2);
+}
+
+@media (max-width: 700px) {
+  .hero {
+    padding-top: 2rem;
+  }
+}

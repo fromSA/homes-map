@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>homes-map-hs</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">HOMES-MAP-HS</p>
+        <h1>Simplify Tenant, Landlord, and Bank Collaboration</h1>
+        <p class="sub">
+          Live view of properties and flow rates from the Haskell API.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section>
+        <div class="section-head">
+          <h2>Properties</h2>
+          <button id="refresh-btn" class="btn">Refresh</button>
+        </div>
+        <div id="properties" class="grid"></div>
+      </section>
+
+      <section>
+        <h2>Flow Rates</h2>
+        <div id="flow-rates" class="panel empty">Select a property to view flow rates.</div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
